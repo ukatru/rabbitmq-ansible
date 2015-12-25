@@ -1,0 +1,4 @@
+rabbitmq_user: rabbitmq
+rabbitmq_install_group: rabbitmq
+rabbitmq_major_version: '3.6.0'
+rabbitmq_install_version: '3.6.0-1'

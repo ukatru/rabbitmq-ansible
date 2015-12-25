@@ -1,0 +1,10 @@
+---
+- name: Configure centos 6 to Install RabbitMQ 3.6.0-1
+  hosts: all
+  sudo: true
+  vars_files:
+    # User defined variables for infrastructure
+    - rabbitmq-vars.yml
+    - passwd.yml
+  roles:
+    - role: rabbitmq-install

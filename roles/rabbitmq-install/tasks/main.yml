@@ -1,0 +1,47 @@
+################################################################################
+# ==> Task Required for Configure Linux to host for rabbitmq
+# ==> Supports version 3.6.0-1
+# ==> Author: Uma M Katru
+################################################################################
+
+# ==> Configure Linux
+- name: Disable SELinux
+  selinux: state=disabled
+- name: Disable Firewall Deamon (iptables)
+  service: name=iptables state=stopped enabled=no
+- name: Change kernel parameters
+  sysctl: name="{{ item.key }}" value="{{ item.value }}" state=present
+  with_dict: kernel_params
+
+- name: Installl erlang package
+  yum: name=https://www.rabbitmq.com/releases/erlang/erlang-17.4-1.el6.x86_64.rpm state=present
+- name: Installl RabbitMQ 
+  yum: name=https://www.rabbitmq.com/releases/rabbitmq-server/v{{rabbitmq_major_version}}/rabbitmq-server-{{rabbitmq_install_version}}.noarch.rpm state=present
+
+# ==> Create users and groups
+
+- name: Create groups
+  group: name={{ rabbitmq_install_group }} state=present
+- name: Create user
+  user: name={{ rabbitmq_user }} group={{ rabbitmq_install_group }} shell=/bin/ksh home=/home/{{ rabbitmq_user }} password={{rabbitmq_os_user_pass}}
+
+# ==> Copy oracle .profile
+
+- name: Copy rabbitmq .profile
+  copy: src=rabbitmq_profile dest='/home/rabbitmq/.profile' owner={{ rabbitmq_user }} group={{ rabbitmq_install_group }} mode=644 force=no
+
+- name: Start RabbitMQ server  (iptables)
+  service: name=rabbitmq-server state=started enabled=yes
+
+- name: add users
+  rabbitmq_user: user=rabbitmq password=dsadm454 tags=administrator vhost=/ configure_priv=.* write_priv=.* read_priv=.* state=present
+
+- name: remove default guest user
+  rabbitmq_user: user=guest state=absent
+
+- name: enable rabbitmq plugins
+  rabbitmq_plugin: names=rabbitmq_management,rabbitmq_tracing,rabbitmq_federation state=enabled
+  notify:
+    - restart rabbitmq
+
+

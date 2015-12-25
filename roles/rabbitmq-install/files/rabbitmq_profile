@@ -1,0 +1,12 @@
+export VISUAL=vi
+export EDITOR=/usr/bin/vi
+
+ENV=$HOME/.kshrc
+export ENV
+export PATH=$PATH:/home/rabbitmq/bin
+umask 000
+stty erase ^?
+export HOST=`hostname`
+export PS1='$HOST:$PWD> '
+export PS2="$HOST:`pwd`>> "
+export PS3="$HOST:`pwd`== "
